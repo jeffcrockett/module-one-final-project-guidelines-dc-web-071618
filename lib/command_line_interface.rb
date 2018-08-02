@@ -65,34 +65,8 @@ class CommandLineInterface
             when options[13] #Exit
                 puts "Goodbye"
         end
-    
     end
 
-    
-
-    # def get_match_input(team)
-    #     puts "Press m for matches"
-    #     user_input = gets.chomp.downcase
-    #
-    #     case user_input
-    #     when user_input == 'm'
-    #         Team.find(team).all_matches
-    #     when user_input == 's'
-    #     end
-    #
-    # end
-
-    # def get_user_input
-    #     puts "Please select a team."
-    #     display_teams
-    #     user_input = gets.chomp.to_i
-    #
-    #     if valid?(user_input)
-    #         display_team_stats(user_input)
-    #     else
-    #         get_user_input
-    #     end
-    # end
 
     def get_user_input
         user_input = gets.chomp.to_i
@@ -137,13 +111,6 @@ class CommandLineInterface
     def valid_info_option?(user_input)
         (1..13).to_a.include?(user_input)
     end
-
-    # def tty_display_record(user_input)
-    #     # puts "You have selected #{team.name}"
-    #     team = Team.find_by(name: user_input)
-    #     puts "#{team.name} has #{team.total_wins.length} wins, #{team.total_losses.length} losses, and #{team.total_draws.length} draws"
-        
-    # end
 
     def print_match_info(matches)
         matches.each do |m|
@@ -199,7 +166,6 @@ class CommandLineInterface
 
     def display_record_against(user_input)
         puts "Please select the team you would like to compare with #{user_input}."
-        # display_teams
         against_name = tty_select_team
         # binding.pry
         team = Team.find_by(name: user_input)
