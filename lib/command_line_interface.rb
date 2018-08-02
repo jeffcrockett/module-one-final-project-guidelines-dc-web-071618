@@ -2,8 +2,6 @@ class CommandLineInterface
 
     def greet
         puts "Welcome!"
-        puts "Please select a team."
-        display_teams
     end
 
     def display_teams
@@ -31,6 +29,7 @@ class CommandLineInterface
             "Wins against a specific team",
             "Losses against a specific team",
             "Draws against a specific team",
+            "Stadium info",
             "Change team",
             "Exit"
         ]
@@ -59,9 +58,11 @@ class CommandLineInterface
                 display_losses_against(name)
             when options[10] #Draws against a specific team
                 display_draws_against(name)
-            when options[11] #Change team
+            when options[11]
+                display_stadium_info(name)
+            when options[12] #Change team
                 tty_display_info_options(tty_select_team)
-            when options[12] #Exit
+            when options[13] #Exit
                 puts "Goodbye"
         end
     
@@ -105,6 +106,15 @@ class CommandLineInterface
         else
             return
         end
+    end
+
+    def display_stadium_info(user_input)
+        team = Team.find_by(name: user_input)
+        puts "Team: #{user_input}"
+        puts "Name: #{team.stadium.name}"
+        puts "Location: #{team.stadium.location}"
+        puts "Capacity: #{team.stadium.capacity}"
+        yes_no_prompt
     end
 
     def get_users_team
