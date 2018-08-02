@@ -12,79 +12,62 @@ class CommandLineInterface
         end
     end
 
-    def display_info_options(id)
-        puts "Press 1 for #{Team.find(id).name}'s record."
-        puts "Press 2 for #{Team.find(id).name}'s matches."
-        puts "Press 3 for #{Team.find(id).name}'s match wins."
-        puts "Press 4 for #{Team.find(id).name}'s match losses."
-        puts "Press 5 for #{Team.find(id).name}'s match draws."
-        puts "Press 6 for #{Team.find(id).name}'s home matches."
-        puts "Press 7 for #{Team.find(id).name}'s away matches."
-        puts "Press 8 for #{Team.find(id).name}'s record against a specific team."
-        puts "Press 9 for #{Team.find(id).name}'s wins against a specific team."
-        puts "Press 10 for #{Team.find(id).name}'s losses against a specific team."
-        puts "Press 11 for #{Team.find(id).name}'s draws with a specific team."
-        puts "Press 12 to select a different team."
-        puts "Press 13 to exit."
-
-        user_input = get_user_input
-
-        if valid_info_option?(user_input)
-            case user_input
-            when 1
-                display_record(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 2
-                display_matches(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 3
-                display_match_wins(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 4
-                display_match_losses(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 5
-                display_match_draws(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 6
-                display_home_matches(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 7
-                display_away_matches(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 8
-                display_record_against(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 9
-                display_wins_against(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 10
-                display_losses_against(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 11
-                display_draws_against(id)
-                display_teams
-                display_info_options(get_users_team)
-            when 12
-                display_teams
-                display_info_options(get_users_team)
-            when 13
-                puts "Goodbye"
-            else
-                puts "Invalid input, please try again."
-            end
-        end
+    def tty_select_team
+        prompt = TTY::Prompt.new 
+        prompt.select("Select a team", Team.all.map{|team| team.name})
     end
+
+    def tty_display_info_options(name)
+        prompt = TTY::Prompt.new 
+        options = [
+            "Overall win-loss record",
+            "All matches",
+            "All wins",
+            "All losses",
+            "All draws",
+            "Home matches",
+            "Away matches",
+            "Record against a specific team",            
+            "Wins against a specific team",
+            "Losses against a specific team",
+            "Draws against a specific team",
+            "Change team",
+            "Exit"
+        ]
+        user_input = prompt.select("\nYou have selected #{name}.\nChoose an option", options)
+        case user_input
+            when options[0] #Overall win-loss record
+                display_record(name)
+            when options[1] #All matches
+                display_matches(name)
+            when options[2] #Wins
+                display_match_wins(name)
+            when options[3] #Losses against a specific team
+                display_match_losses(name)
+            when options[4] #Draws against a specific team
+                display_match_draws(name)
+            when options[5] #Home matches
+                display_home_matches(name)
+            when options[6] #Away matches
+                display_away_matches(name)
+            when options[7] #All matches 
+                display_record_against(name)
+            when options[8] #Wins against a specific team 
+                display_wins_against(name)
+                # tty_display_info_options(tty_select_team)
+            when options[9] #Losses against a specific team
+                display_losses_against(name)
+            when options[10] #Draws against a specific team
+                display_draws_against(name)
+            when options[11] #Change team
+                tty_display_info_options(tty_select_team)
+            when options[12] #Exit
+                puts "Goodbye"
+        end
+    
+    end
+
+    
 
     # def get_match_input(team)
     #     puts "Press m for matches"
@@ -114,6 +97,16 @@ class CommandLineInterface
         user_input = gets.chomp.to_i
     end
 
+    def yes_no_prompt
+        prompt = TTY::Prompt.new
+        response = prompt.yes?('Do you want to continue?')
+        if response
+            tty_display_info_options(tty_select_team)
+        else
+            return
+        end
+    end
+
     def get_users_team
         user_input = get_user_input
 
@@ -135,135 +128,149 @@ class CommandLineInterface
         (1..13).to_a.include?(user_input)
     end
 
+    # def tty_display_record(user_input)
+    #     # puts "You have selected #{team.name}"
+    #     team = Team.find_by(name: user_input)
+    #     puts "#{team.name} has #{team.total_wins.length} wins, #{team.total_losses.length} losses, and #{team.total_draws.length} draws"
+        
+    # end
+
     def display_record(user_input)
-        team = Team.find(user_input)
         # puts "You have selected #{team.name}"
+        team = Team.find_by(name: user_input)
         puts "#{team.name} has #{team.total_wins.length} wins, #{team.total_losses.length} losses, and #{team.total_draws.length} draws"
+        yes_no_prompt
     end
 
     def display_matches(user_input)
-        team = Team.find(user_input)
+        team = Team.find_by(name: user_input)
         team.all_matches.each do |m|
             puts "Home Team: #{Team.find(m.home_team_id).name}"
             puts "Away Team: #{Team.find(m.away_team_id).name}"
             puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
         end
+        yes_no_prompt
     end
 
     def display_match_wins(user_input)
-        team = Team.find(user_input)
+        team = Team.find_by(name: user_input)
         team.total_wins.each do |m|
             puts "Home Team: #{Team.find(m.home_team_id).name}"
             puts "Away Team: #{Team.find(m.away_team_id).name}"
             puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
         end
+        yes_no_prompt
     end
 
     def display_match_losses(user_input)
-        team = Team.find(user_input)
+        team = Team.find_by(name: user_input)
         team.total_losses.each do |m|
             puts "Home Team: #{Team.find(m.home_team_id).name}"
             puts "Away Team: #{Team.find(m.away_team_id).name}"
             puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
         end
+        yes_no_prompt
     end
 
     def display_match_draws(user_input)
-        team = Team.find(user_input)
+        team = Team.find_by(name: user_input)
         team.total_draws.each do |m|
             puts "Home Team: #{Team.find(m.home_team_id).name}"
             puts "Away Team: #{Team.find(m.away_team_id).name}"
             puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
         end
+        yes_no_prompt
     end
 
     def display_home_matches(user_input)
-        team = Team.find(user_input)
+        team = Team.find_by(name: user_input)
         team.home_team_matches.each do |m|
             puts "Home Team: #{Team.find(m.home_team_id).name}"
             puts "Away Team: #{Team.find(m.away_team_id).name}"
             puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
         end
+        yes_no_prompt
     end
 
     def display_away_matches(user_input)
-        team = Team.find(user_input)
+        team = Team.find_by(name: user_input)
         team.away_team_matches.each do |m|
             puts "Home Team: #{Team.find(m.home_team_id).name}"
             puts "Away Team: #{Team.find(m.away_team_id).name}"
             puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
         end
+        yes_no_prompt
     end
 
-    def display_record_against(original_id)
-        puts "Please select the team you would like to compare with #{Team.find(original_id).name}."
-        display_teams
-        against_id = get_user_input
+    def display_record_against(user_input)
+        puts "Please select the team you would like to compare with #{user_input}."
+        # display_teams
+        against_name = tty_select_team
+        # binding.pry
+        team = Team.find_by(name: user_input)
+        against_team = Team.find_by(name: against_name)
+        puts "#{team.name} has #{team.total_wins_against(against_name).length} wins, #{team.total_losses_against(against_name).length} losses, and #{team.total_draws_against(against_name).length} draws against #{against_name}."
+        yes_no_prompt
+    end
 
-        if valid_team?(against_id)
-            team = Team.find(original_id)
-            against_team_name = Team.find(against_id).name
-            puts "#{team.name} has #{team.total_wins_against(against_team_name).length} wins, #{team.total_losses_against(against_team_name).length} losses, and #{team.total_draws_against(against_team_name).length} draws against #{against_team_name}."
+    def display_wins_against(user_input)
+        puts "Please select the team you would like to compare with #{user_input}."
+        # display_teams
+        against_name = tty_select_team
+        # binding.pry
+        team = Team.find_by(name: user_input)
+        against_team = Team.find_by(name: against_name)
+        if team.total_wins_against(against_name).empty?
+            puts "#{team.name} has no wins against #{against_team.name}"
+            yes_no_prompt
         else
-            puts "Invalid input, please try again."
-            display_record_against(original_id)
+            team.total_wins_against(against_name).each do |m|
+            puts "Home Team: #{Team.find(m.home_team_id).name}"
+            puts "Away Team: #{Team.find(m.away_team_id).name}"
+            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
+            yes_no_prompt    
+        end
         end
     end
 
-    def display_wins_against(original_id)
-        puts "Please select the team you would like to compare with #{Team.find(original_id).name}."
-        display_teams
-        against_id = gets_user_input
-
-        if valid_team?(against_id)
-            team = Team.find(original_id)
-            against_team_name = Team.find(against_id).name
-            team.total_wins_against.each do |m|
-                puts "Home Team: #{Team.find(m.home_team_id).name}"
-                puts "Away Team: #{Team.find(m.away_team_id).name}"
-                puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-            end
+    def display_losses_against(user_input)
+        puts "Please select the team you would like to compare with #{user_input}."
+        # display_teams
+        against_name = tty_select_team
+        # binding.pry
+        team = Team.find_by(name: user_input)
+        against_team = Team.find_by(name: against_name)
+        if team.total_losses_against(against_name).empty?
+            puts "#{team.name} has no losses against #{against_team.name}"
+            yes_no_prompt
         else
-            puts "Invalid input, please try again."
-            display_wins_against(original_id)
+            team.total_losses_against(against_name).each do |m|
+            puts "Home Team: #{Team.find(m.home_team_id).name}"
+            puts "Away Team: #{Team.find(m.away_team_id).name}"
+            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
+            end
+            yes_no_prompt
         end
     end
 
-    def display_losses_against(original_id)
-        puts "Please select the team you would like to compare with #{Team.find(original_id).name}."
-        display_teams
-        against_id = gets_user_input
-
-        if valid_team?(against_id)
-            team = Team.find(original_id)
-            against_team_name = Team.find(against_id).name
-            team.total_losses_against.each do |m|
-                puts "Home Team: #{Team.find(m.home_team_id).name}"
-                puts "Away Team: #{Team.find(m.away_team_id).name}"
-                puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-            end
+    def display_draws_against(user_input)
+        puts "Please select the team you would like to compare with #{user_input}."
+        # display_teams
+        against_name = tty_select_team
+        # binding.pry
+        team = Team.find_by(name: user_input)
+        against_team = Team.find_by(name: against_name)
+        if team.total_draws_against(against_name).empty?
+            puts "#{team.name} has no draws against #{against_team.name}"
+            yes_no_prompt
         else
-            puts "Invalid input, please try again."
-            display_losses_against(original_id)
+            team.total_draws_against(against_name).each do |m|
+            puts "Home Team: #{Team.find(m.home_team_id).name}"
+            puts "Away Team: #{Team.find(m.away_team_id).name}"
+            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
+            yes_no_prompt
         end
-    end
-
-    def display_draws_against(original_id)
-        puts "Please select the team you would like to compare with #{Team.find(original_id).name}."
-        display_teams
-        against_id = gets_user_input
-
-        if valid_team?(against_id)
-            team = Team.find(original_id)
-            against_team_name = Team.find(against_id).name
-            team.total_draws_against.each do |m|
-                puts "Home Team: #{Team.find(m.home_team_id).name}"
-                puts "Away Team: #{Team.find(m.away_team_id).name}"
-                puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-            end
-        else
-            puts "Invalid input, please try again."
-            display_draws_against(original_id)
         end
     end
 end
+
