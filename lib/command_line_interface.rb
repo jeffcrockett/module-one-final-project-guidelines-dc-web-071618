@@ -99,7 +99,7 @@ class CommandLineInterface
 
     def yes_no_prompt
         prompt = TTY::Prompt.new
-        response = prompt.yes?('Do you want to continue?')
+        response = prompt.yes?("\nDo you want to continue?")
         if response
             tty_display_info_options(tty_select_team)
         else
@@ -135,6 +135,14 @@ class CommandLineInterface
         
     # end
 
+    def print_match_info(matches)
+        matches.each do |m|
+          puts "\nHome Team: #{Team.find(m.home_team_id).name}"
+          puts "Away Team: #{Team.find(m.away_team_id).name}"
+          puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
+      end
+    end
+
     def display_record(user_input)
         # puts "You have selected #{team.name}"
         team = Team.find_by(name: user_input)
@@ -144,61 +152,38 @@ class CommandLineInterface
 
     def display_matches(user_input)
         team = Team.find_by(name: user_input)
-        team.all_matches.each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-        end
+        print_match_info(team.all_matches)
         yes_no_prompt
     end
 
     def display_match_wins(user_input)
         team = Team.find_by(name: user_input)
-        team.total_wins.each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-        end
+        print_match_info(team.total_wins)        
         yes_no_prompt
     end
 
     def display_match_losses(user_input)
         team = Team.find_by(name: user_input)
-        team.total_losses.each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-        end
+        print_match_info(team.total_losses)        
         yes_no_prompt
     end
 
+
     def display_match_draws(user_input)
         team = Team.find_by(name: user_input)
-        team.total_draws.each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-        end
+        print_match_info(team.total_draws)        
         yes_no_prompt
     end
 
     def display_home_matches(user_input)
         team = Team.find_by(name: user_input)
-        team.home_team_matches.each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-        end
+        print_match_info(team.home_team_matches)        
         yes_no_prompt
     end
 
     def display_away_matches(user_input)
         team = Team.find_by(name: user_input)
-        team.away_team_matches.each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-        end
+        print_match_info(team.away_team_matches)        
         yes_no_prompt
     end
 
@@ -224,12 +209,8 @@ class CommandLineInterface
             puts "#{team.name} has no wins against #{against_team.name}"
             yes_no_prompt
         else
-            team.total_wins_against(against_name).each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
+            print_match_info(team.total_wins_against(against_name))
             yes_no_prompt    
-        end
         end
     end
 
@@ -244,11 +225,7 @@ class CommandLineInterface
             puts "#{team.name} has no losses against #{against_team.name}"
             yes_no_prompt
         else
-            team.total_losses_against(against_name).each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-            end
+            print_match_info(team.total_losses_against(against_name))            
             yes_no_prompt
         end
     end
@@ -264,12 +241,8 @@ class CommandLineInterface
             puts "#{team.name} has no draws against #{against_team.name}"
             yes_no_prompt
         else
-            team.total_draws_against(against_name).each do |m|
-            puts "Home Team: #{Team.find(m.home_team_id).name}"
-            puts "Away Team: #{Team.find(m.away_team_id).name}"
-            puts "Final Score: #{Team.find(m.home_team_id).name} - #{m.home_team_score}, #{Team.find(m.away_team_id).name} - #{m.away_team_score}"
-            yes_no_prompt
-        end
+            print_match_info(team.total_draws_against(against_name))    
+            yes_no_prompt    
         end
     end
 end
