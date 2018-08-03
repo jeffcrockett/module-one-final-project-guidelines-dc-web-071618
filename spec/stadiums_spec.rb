@@ -3,3 +3,5 @@ describe ".all" do
         expect(Stadium.all).to be_an_instance_of(Stadium::ActiveRecord_Relation)
     end
 end
+
+describe 

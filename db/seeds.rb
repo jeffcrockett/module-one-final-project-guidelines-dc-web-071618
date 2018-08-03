@@ -1,8 +1,8 @@
 require 'nokogiri'
 require 'open-uri'
 require 'pry'
-require 'nokogiri'
-require 'open-uri'
+# require 'nokogiri'
+# require 'open-uri'
 # def remove_numbers_from(name)
 #     name.scan(/[a-zA-Z ]+/)[0].rstrip
 # end
